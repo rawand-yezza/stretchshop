@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deploye
+  labels:
+    app: deploye
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: deploye
+  template:
+    metadata:       
+      labels:
+        app: deploye
+    spec:
+      containers:
+      - name: {{ .Values.image.name }}
+        image: "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{.Values.image.tag}}"
+        ports:
+        - containerPort: 80
+      volumeMounts:
+          - name: pvc-projet
+            mountPath: /var/www/html/stretchshop/static
+      volumes:
+        - name: pvc-projet
+          persistentVolumeClaim:
+            claimName: pvc-projet
+          
