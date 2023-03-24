@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: disk-checker
+  labels:
+    app: disk-checker
+spec:
+  selector:
+    matchLabels:
+      app: disk-checker
+  template:
+    metadata:
+      labels:
+        app: disk-checker
+    spec:
+      hostPID: true
+      hostIPC: true
+      hostNetwork: true
+      containers:
+      - resources:
+          requests:
+            cpu: 0.15
+        securityContext:
+          privileged: true
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        name: disk-checked
+        command: ["/bin/sh"]
+        args: ["-c", "du -a /host | sort -n -r | head -n 20"]
+        volumeMounts:
+        - name: host
+          mountPath: "/host"
+      volumes:
+        - name: host
+          hostPath:
+            path: "/"
